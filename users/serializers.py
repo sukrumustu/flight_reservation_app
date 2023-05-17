@@ -8,8 +8,10 @@ from django.contrib.auth.password_validation import validate_password
 from dj_rest_auth.serializers import TokenSerializer
 
 class RegisterSerializer(serializers.ModelSerializer):
-
-    email = serializers.EmailField(                        #! emaili tekrar tanımlayıp unique true yapıyoruz. Bu sayede registiration esnasında zorunlu alan oluyor ve bunu kullanıp sisteme giriş yapabiliyoruz.
+    
+    #! Normalde email ile dj-rest-auth paketi sayesinde password kullanarak login yapabiliyoruz. Ancak email başta unique olmadığından  tekrar tanımlayıp unique true yapıyoruz. Bu sayede registiration esnasında zorunlu alan oluyor ve bunu kullanıp sisteme giriş yapabiliyoruz. 
+    
+    email = serializers.EmailField(                        
         required = True, 
         validators = [UniqueValidator(queryset=User.objects.all())] )
 
@@ -24,8 +26,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         required=True,
         style ={"input_type":"password"}
         )
-
-    class Meta:
+    
+# normalde User içerisinde (databasede password2 yok. Password2 yi diğer tüm data ile birlikte önce kullanıcıdan alacağız. Sonra password ile match edip kullanıcıyı database'e kaydetmeden önce tekrar validated-datadan çıakracağız )
+    class Meta:                                  
         model = User
         fields = [
             'username',
@@ -40,9 +43,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         #     'password2': {'write_only': True},
         # }
 
-    # def validate_last_name(self, value):    #! bu şekilde yalnız bir field ile ilgili validate yapılabilir
+    # def validate_last_name(self, value):    #! bu şekilde yalnız bir field ile ilgili validate yapılabilir. 
 
-
+    # bu validate func ile passwordleri match edip doğruluyoruz. Eğer doğruysa User içerisinde yer alan aşağıdaki create metodunu override edip yeni user oluşturuyoruz. 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError(
