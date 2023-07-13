@@ -18,7 +18,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True,        #! write-only demek yalnızca paswordü gir, dönüşte bana geri getirme. GET ile alınamaz.
         required =True,
-        validators=[validate_password],
+        validators=[validate_password],   #settings.py veya base.py'daki password_validatorslere göre işlem yapıyor. 
         style ={"input_type":"password"}
         )
     password2 = serializers.CharField(
